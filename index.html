@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humanitarians AI Games</title>
+<meta name="description" content="Short browser games built by Humanitarians AI volunteers. Play in your browser, no installation required.">
+<meta property="og:title" content="Humanitarians AI Games">
+<meta property="og:description" content="Play browser games built by Humanitarians AI volunteers, each one rooted in a real project.">
+<meta property="og:type" content="website">
+<style>
+  :root{--ink:#1b1b1b;--red:#7a0000;--red-dark:#5f0000;--mist:#62686b;--line:#e3ded6;--muted:#f6f3ed;--bg:#fff;--night:#12161a;--mint:#c8ead8}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);line-height:1.6}
+  a{color:inherit}
+  button,a{-webkit-tap-highlight-color:transparent}
+  .wrap{width:min(1160px,calc(100% - 40px));margin:0 auto}
+  .site-nav{position:absolute;inset:0 0 auto;z-index:10;color:#fff}
+  .site-nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:22px 0;border-bottom:1px solid rgba(255,255,255,.2)}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-size:1rem;font-weight:800;letter-spacing:-.01em}
+  .brand-mark{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(255,255,255,.35);border-radius:50%;background:rgba(255,255,255,.1);font-size:.8rem;padding-left:2px}
+  .nav-links{display:flex;align-items:center;gap:24px;font-size:.88rem;font-weight:650}
+  .nav-links a{text-decoration:none;color:#edf7f3}
+  .nav-links a:hover{text-decoration:underline;text-underline-offset:5px}
+  .hero{position:relative;background:radial-gradient(900px 430px at 88% -5%,rgba(160,20,20,.55),transparent 70%),radial-gradient(700px 360px at 0% 110%,rgba(200,234,216,.12),transparent 70%),linear-gradient(160deg,#0d1114,var(--night) 60%,#171c20);color:#fff;padding:150px 0 84px}
+  .kicker{font-size:.76rem;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--mint);margin:0 0 .75rem}
+  .hero h1{font-size:clamp(3.4rem,9vw,6.2rem);line-height:.95;margin:0 0 1.35rem;letter-spacing:-.055em;max-width:12ch}
+  .hero p.sub{max-width:38rem;margin:0;font-size:clamp(1.05rem,2vw,1.24rem);color:#e5eeeb}
+  .hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px;margin-top:28px}
+  .count{margin:0;font-size:.85rem;font-weight:700;color:#b9c7c2;letter-spacing:.02em}
+  section{padding:76px 0}
+  .alt{background:var(--muted)}
+  .card{background:var(--bg);border:1px solid var(--line);border-radius:16px;box-shadow:0 2px 5px rgba(28,24,18,.04)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;background:var(--red);color:#fff;text-decoration:none;font-weight:700;font-size:.9rem;padding:.7rem 1.35rem;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background .15s,transform .15s}
+  .btn:hover{background:var(--red-dark);transform:translateY(-1px)}
+  h2.sec{font-size:clamp(2rem,4vw,2.7rem);line-height:1.15;letter-spacing:-.04em;margin:0 0 .65rem}
+  .lead{color:var(--mist);max-width:48rem;margin:0 0 36px;font-size:1.02rem}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:12px}
+  .section-head .lead{margin-bottom:0}
+  .compat{flex:0 0 auto;border:1px solid var(--line);border-radius:999px;background:#fff;padding:.52rem .85rem;color:var(--mist);font-size:.78rem;font-weight:700;white-space:nowrap}
+  .project{margin-top:52px}
+  .proj-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 24px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .proj-head h3{margin:0;font-size:1.5rem;letter-spacing:-.03em}
+  .proj-head p{flex:1 1 22rem;margin:0;color:var(--mist);font-size:.92rem}
+  .proj-head a{font-size:.88rem;font-weight:700;color:var(--red);text-underline-offset:4px}
+  .grid{display:grid;gap:26px;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+  .game{overflow:hidden;transition:transform .2s,box-shadow .2s}
+  .game:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(31,39,36,.12)}
+  .game button{display:flex;flex-direction:column;width:100%;height:100%;padding:0;border:0;background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}
+  .shot{position:relative;aspect-ratio:16/10;background:#0d1114;width:100%}
+  .shot::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.32),transparent 42%);pointer-events:none}
+  .shot img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+  .game:hover .shot img{transform:scale(1.015)}
+  .tag{position:absolute;z-index:1;left:16px;top:16px;color:#fff;font-size:.7rem;font-weight:850;letter-spacing:.09em;text-transform:uppercase;padding:.34rem .75rem;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+  .play-dot{position:absolute;z-index:1;right:16px;bottom:16px;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--red);color:#fff;font-size:1rem;padding-left:3px;box-shadow:0 6px 18px rgba(0,0,0,.24)}
+  .game .body{display:flex;flex:1;flex-direction:column;align-items:flex-start;padding:25px 26px 27px}
+  .game h3{margin:0 0 .45rem;font-size:1.45rem;letter-spacing:-.025em}
+  .game p{margin:0 0 1.25rem;color:var(--mist);font-size:.94rem}
+  .game .body .btn{margin-top:auto}
+  .note{margin:48px 0 0;text-align:center;color:var(--mist);font-size:.95rem}
+  .note[hidden]{display:none}
+  footer{border-top:1px solid var(--line);padding:28px 0;font-size:.85rem;color:var(--mist)}
+  footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  /* in-page player */
+  .modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.84);padding:14px;backdrop-filter:blur(8px)}
+  .modal[open]{display:flex}
+  .frame{display:flex;flex-direction:column;width:100%;max-width:1200px;height:92vh;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 28px 80px rgba(0,0,0,.4)}
+  .bar{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--line)}
+  .bar h2{flex:1;margin:0;font-size:1.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar a{font-size:.85rem}
+  .bar .x{cursor:pointer;width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--line);background:#fff;border-radius:8px;font-size:1.25rem}
+  .bar .tag{position:static}
+  .frame iframe{flex:1;border:0;background:#000;width:100%}
+  .frame iframe[hidden]{display:none}
+  .webgl{flex:1;overflow:auto;padding:28px 24px;background:#fff}
+  .webgl h3{margin:0 0 .4rem;font-size:1.4rem}
+  .webgl p{margin:0 0 1rem;color:var(--mist)}
+  .webgl dl{margin:0;display:grid;gap:14px}
+  .webgl dt{font-weight:700}
+  .webgl dd{margin:.2rem 0 0;color:var(--mist);font-size:.95rem}
+  .webgl code{background:var(--muted);border:1px solid #e5e2dc;border-radius:4px;padding:0 .3em;font-size:.9em}
+  :focus-visible{outline:3px solid #d39b45;outline-offset:3px}
+  @media(max-width:760px){
+    .wrap{width:min(100% - 28px,1160px)}
+    .site-nav .wrap{padding:16px 0}
+    .hero{padding:112px 0 62px}
+    section{padding:56px 0}
+    .section-head{align-items:flex-start;flex-direction:column;gap:16px}
+    .bar a{display:none}
+    .frame{height:94vh;border-radius:10px}
+  }
+  @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav class="site-nav" aria-label="Primary navigation">
+  <div class="wrap">
+    <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">▶</span><span>Humanitarians AI Games</span></a>
+    <div class="nav-links">
+      <a href="https://www.humanitarians.ai">Humanitarians AI ↗</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="kicker">A Humanitarians AI project</p>
+    <h1>Play something real</h1>
+    <p class="sub">Short browser games built by Humanitarians AI volunteers. Each one turns an idea from a real project into something you can play, with no installation and no account.</p>
+    <div class="hero-actions">
+      <a class="btn" href="#games-section">Browse the games ↓</a>
+      <p class="count" id="count" aria-live="polite"></p>
+    </div>
+  </div>
+</header>
+
+<section class="alt" id="games-section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2 class="sec">All the games</h2>
+        <p class="lead">Pick a game and it opens right here on the page. Close it with the × button, or open it full screen.</p>
+      </div>
+      <span class="compat">Browser-based · WebGL2</span>
+    </div>
+
+    <div id="projects"></div>
+    <p class="note" id="note" hidden></p>
+    <noscript><p class="note">This page needs JavaScript to list the games.</p></noscript>
+  </div>
+</section>
+
+<footer><div class="wrap"><span>A volunteer project of <a href="https://www.humanitarians.ai">Humanitarians AI</a>, a Massachusetts 501(c)(3).</span><a href="#">Back to top ↑</a></div></footer>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="frame">
+    <div class="bar">
+      <span class="tag" id="m-tag"></span>
+      <h2 id="m-title"></h2>
+      <a id="m-open" href="#" target="_blank" rel="noopener">Open full screen ↗</a>
+      <button class="x" id="m-close" type="button" aria-label="Close game">×</button>
+    </div>
+    <div class="webgl" id="m-webgl" hidden>
+      <h3>This game needs WebGL2</h3>
+      <p>Your browser is reporting that WebGL2 is turned off. It is on by default in every current browser, so one of these usually fixes it. Reload this page afterwards.</p>
+      <dl>
+        <dt>Chrome</dt>
+        <dd>Settings → System → turn on <b>Use graphics acceleration when available</b> → Relaunch. If it is already on, open <code>chrome://gpu</code> and check the WebGL2 line; an extension that blocks fingerprinting may be disabling it, so try an Incognito window.</dd>
+        <dt>Edge</dt>
+        <dd>Settings → System and performance → turn on <b>Use graphics acceleration when available</b> → Restart.</dd>
+        <dt>Firefox</dt>
+        <dd>Settings → General → Performance → untick <b>Use recommended performance settings</b> → tick <b>Use hardware acceleration when available</b>. If it still fails, open <code>about:config</code> and make sure <code>webgl.disabled</code> is <b>false</b>.</dd>
+        <dt>Safari</dt>
+        <dd>Safari 15 and later has WebGL2 on by default; update macOS or iOS if you are older than that.</dd>
+        <dt>Still stuck?</dt>
+        <dd>Update the browser, or try another one. Firefox keeps WebGL working even with hardware acceleration off.</dd>
+      </dl>
+    </div>
+    <iframe id="m-frame" title="" allow="autoplay; fullscreen; gamepad" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
+</div>
+
+<script>
+// The game list lives in games.json. Add a game there; this page never needs editing.
+const $ = (id) => document.getElementById(id);
+const h = (tag, props = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === "class") n.className = v;
+    else if (k === "style") n.style.cssText = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  n.append(...kids);
+  return n;
+};
+
+const modal = $("modal"), frame = $("m-frame"), notice = $("m-webgl");
+let lastFocus = null;
+
+function hasWebGL2() {
+  if (location.search.includes("nowebgl")) return false;           // for testing the notice
+  try { return !!document.createElement("canvas").getContext("webgl2"); } catch { return false; }
+}
+
+function openGame(g, trigger) {
+  const ok = hasWebGL2();
+  lastFocus = trigger || null;
+  notice.hidden = ok; frame.hidden = !ok;
+  $("m-title").textContent = g.title;
+  const tag = $("m-tag"); tag.textContent = g.tag; tag.style.background = g.accent;
+  $("m-open").href = g.url;
+  frame.title = g.title; frame.src = ok ? g.url : "about:blank";
+  modal.setAttribute("open", ""); document.body.style.overflow = "hidden";
+  $("m-close").focus();
+  history.replaceState(null, "", "#" + g.id);
+}
+
+function closeGame() {
+  modal.removeAttribute("open"); frame.src = "about:blank"; document.body.style.overflow = "";
+  history.replaceState(null, "", location.pathname + location.search);
+  if (lastFocus) lastFocus.focus();
+}
+
+$("m-close").addEventListener("click", closeGame);
+modal.addEventListener("mousedown", (e) => { if (e.target === modal) closeGame(); });
+window.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.hasAttribute("open")) closeGame(); });
+
+function card(g) {
+  const img = h("img", { src: g.image, alt: g.title + " game preview", loading: "lazy" });
+  img.addEventListener("error", () => img.remove());              // dark placeholder stays if a preview is missing
+  const btn = h("button", { type: "button", "aria-label": "Play " + g.title, onclick: () => openGame(g, btn) },
+    h("div", { class: "shot" }, img,
+      h("span", { class: "tag", style: "background:" + g.accent }, g.tag),
+      h("span", { class: "play-dot", "aria-hidden": "true" }, "▶")),
+    h("div", { class: "body" }, h("h3", {}, g.title), h("p", {}, g.desc), h("span", { class: "btn" }, "Play game")));
+  return h("article", { class: "card game" }, btn);
+}
+
+function normalize(g) {
+  return {
+    ...g,
+    project: g.project || "More games",
+    tag: g.tag || "Game",
+    accent: /^#[0-9a-f]{3,8}$/i.test(g.accent || "") ? g.accent : "#5E6C6F",
+    url: g.url || `play/${g.id}/index.html`,                      // hosted here by default
+    image: g.image || `screenshots/${g.id}.png`
+  };
+}
+
+function render(data) {
+  const games = (data.games || []).map(normalize);
+  const seen = new Set();
+  for (const g of games) { if (seen.has(g.id)) console.warn("Duplicate game id in games.json:", g.id); seen.add(g.id); }
+
+  const byProject = new Map();
+  for (const g of games) { if (!byProject.has(g.project)) byProject.set(g.project, []); byProject.get(g.project).push(g); }
+
+  const root = $("projects");
+  for (const [name, list] of byProject) {
+    const meta = (data.projects || {})[name] || {};
+    const head = h("div", { class: "proj-head" }, h("h3", {}, name));
+    if (meta.blurb) head.append(h("p", {}, meta.blurb));
+    if (meta.href) head.append(h("a", { href: meta.href, target: "_blank", rel: "noopener" }, "About " + name + " ↗"));
+    root.append(h("div", { class: "project" }, head, h("div", { class: "grid" }, ...list.map(card))));
+  }
+
+  const n = games.length, p = byProject.size;
+  $("count").textContent = n ? `${n} ${n === 1 ? "game" : "games"} · ${p} ${p === 1 ? "project" : "projects"}` : "";
+  if (!n) { $("note").hidden = false; $("note").textContent = "No games are listed yet. Check back soon."; }
+
+  const want = games.find((g) => "#" + g.id === location.hash);
+  if (want) openGame(want, null);
+}
+
+fetch("games.json", { cache: "no-cache" })
+  .then((r) => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(render)
+  .catch((err) => {
+    console.error("Could not load games.json:", err);
+    $("note").hidden = false;
+    $("note").textContent = "The game list could not be loaded. Please reload the page. (If you opened this file directly from disk, serve the folder with a local web server instead.)";
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "projects": {
+    "LoonNet": {
+      "blurb": "Four short games about the common loon's year on the Whitefish Chain, each tied to real field research.",
+      "href": "https://loonnet.humanitarians.ai/"
+    }
+  },
+  "games": [
+    {
+      "id": "nest-site",
+      "project": "LoonNet",
+      "title": "Nest Site",
+      "tag": "Spring",
+      "accent": "#3E8B5F",
+      "desc": "Choose a safe shoreline nesting site. Place it too high and a loon cannot reach it; place it too low and boat wake can swamp it. Discover how artificial nesting platforms can help.",
+      "url": "https://loonnet.humanitarians.ai/nest-site/index.html",
+      "image": "https://loonnet.humanitarians.ai/screenshots/nest-site.png"
+    },
+    {
+      "id": "deep-dive",
+      "project": "LoonNet",
+      "title": "Deep Dive",
+      "tag": "Summer",
+      "accent": "#2F6F63",
+      "desc": "Dive to feed loon chicks through a season of changing water clarity. Learn why clear water matters to sight-hunting loons and why lead tackle is such a serious hazard.",
+      "url": "https://loonnet.humanitarians.ai/deep-dive/index.html",
+      "image": "https://loonnet.humanitarians.ai/screenshots/deep-dive.png"
+    },
+    {
+      "id": "runway",
+      "project": "LoonNet",
+      "title": "Runway",
+      "tag": "Fall",
+      "accent": "#A96A16",
+      "desc": "Help a loon build enough speed across open water to become airborne. Learn why loons need a long aquatic runway and how birds can become stranded on wet pavement.",
+      "url": "https://loonnet.humanitarians.ai/runway/index.html",
+      "image": "https://loonnet.humanitarians.ai/screenshots/runway.png"
+    },
+    {
+      "id": "chick-taxi",
+      "project": "LoonNet",
+      "title": "Chick Taxi",
+      "tag": "Standalone",
+      "accent": "#5E6C6F",
+      "desc": "Balance and collect while young chicks ride safely on a parent's back, in a simple browser game designed for the youngest visitors.",
+      "url": "https://loonnet.humanitarians.ai/chick-taxi/index.html",
+      "image": "https://loonnet.humanitarians.ai/screenshots/chick-taxi.png"
+    }
+  ]
+}
