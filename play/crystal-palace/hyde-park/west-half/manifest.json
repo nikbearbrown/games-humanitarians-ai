@@ -1,0 +1,281 @@
+{
+ "title": "The Crystal Palace, Hyde Park 1851: west half",
+ "note": "Everything the viewer shows is listed here. To add an exhibit, add an entry to \"exhibits\" and (optionally) a stop to \"tour\"; viewer code does not change.",
+ "unit": "m",
+ "up": "Z",
+ "frame": {
+  "library": "data/west-half-library.glb",
+  "parts": "data/west-half-parts.json",
+  "cameras": "data/west-half-cameras.json",
+  "years": [
+   1851,
+   1851
+  ],
+  "source": "course-models/crystal-palace-1851-claude/crystal-palace-1851.blend (Claude, from Downes 1852 plates)"
+ },
+ "buckets": {
+  "record": {
+   "label": "Matches the record",
+   "color": "#3d6fa8",
+   "help": "agrees with the figures it was built from; a consistency check, not independent proof (ledger row 7)"
+  },
+  "inferred": {
+   "label": "Partly inferred or simplified",
+   "color": "#d98a2b",
+   "help": "right size and place, but a level, height or detail is reasoned or left out"
+  },
+  "departure": {
+   "label": "Departure from the record",
+   "color": "#c0463a",
+   "help": "deliberately different from the record"
+  },
+  "exhibit": {
+   "label": "Added exhibit",
+   "color": "#7a5aa6",
+   "help": "built from published dimensions and one plate, tolerance 5-10%"
+  }
+ },
+ "provenance": {
+  "PART_ColumnShaft": {
+   "bucket": "record",
+   "kind": "column shaft",
+   "rows": [
+    1
+   ],
+   "note": "8 in across, top 18 ft 11 3/4 in above the floor; section simplified."
+  },
+  "PART_ColumnUpper": {
+   "bucket": "record",
+   "kind": "upper column",
+   "rows": [
+    2
+   ],
+   "note": "16 ft 7 1/2 in between connecting pieces; section simplified."
+  },
+  "PART_ConnectingPiece": {
+   "bucket": "record",
+   "kind": "connecting piece",
+   "rows": [
+    3
+   ],
+   "note": "Length and position match; flanges and snugs simplified."
+  },
+  "PART_Girder24": {
+   "bucket": "record",
+   "kind": "24 ft girder",
+   "rows": [
+    4
+   ],
+   "note": "Length, depth and panel layout match; sections simplified."
+  },
+  "PART_GalleryPanel": {
+   "bucket": "record",
+   "kind": "gallery floor",
+   "rows": [
+    11
+   ],
+   "note": "Surface level and widths match; strip positions read off Plate II by eye; joists and trussing not modelled."
+  },
+  "PART_CrossGallery": {
+   "bucket": "record",
+   "kind": "cross gallery",
+   "rows": [
+    19
+   ],
+   "note": "48 x 24 ft with two 8 x 16 ft well holes; hole positions read off Plate II to about 1 ft."
+  },
+  "PART_RoofUnit": {
+   "bucket": "inferred",
+   "kind": "roof unit",
+   "rows": [
+    5
+   ],
+   "note": "Gutter pitch matches; valley level and rise inferred. Plain sheets, no glazing or sash bars."
+  },
+  "PART_Balustrade24": {
+   "bucket": "inferred",
+   "kind": "gallery railing",
+   "rows": [
+    12
+   ],
+   "note": "No plate prints the height; read off Plate VI. Lattice simplified."
+  },
+  "PART_Balustrade8": {
+   "bucket": "inferred",
+   "kind": "gallery railing",
+   "rows": [
+    12
+   ],
+   "note": "No plate prints the height; read off Plate VI. Lattice simplified."
+  },
+  "PART_StairFlight": {
+   "bucket": "inferred",
+   "kind": "stair flight",
+   "rows": [
+    17
+   ],
+   "note": "Counts, widths and spacing match; going and handrail height inferred from Plate XV."
+  },
+  "PART_StairLanding": {
+   "bucket": "inferred",
+   "kind": "stair landing",
+   "rows": [
+    18
+   ],
+   "note": "Size matches; level inferred as half the gallery height."
+  },
+  "PART_StairColumn": {
+   "bucket": "inferred",
+   "kind": "stair column",
+   "rows": [
+    18
+   ],
+   "note": "Size and spacing match; solid, no base plates or bracing."
+  },
+  "FLOOR_ground.001": {
+   "bucket": "departure",
+   "kind": "ground floor slab",
+   "rows": [
+    6
+   ],
+   "note": "Solid slab; the record shows open boarding on joists."
+  }
+ },
+ "exhibits": [
+  {
+   "id": "osler-fountain",
+   "title": "Osler crystal fountain",
+   "glb": "exhibits/osler-crystal-fountain.glb",
+   "yup": true,
+   "position": [
+    0,
+    0,
+    0
+   ],
+   "years": [
+    1851,
+    1851
+   ],
+   "bucket": "exhibit",
+   "placement": "At the model origin, the centre of the nave and transept crossing (controls.json). controls.json says the crossing's position along the length should be confirmed against Plate I."
+  }
+ ],
+ "tour": [
+  {
+   "id": "overview",
+   "cam": "cam_overview",
+   "title": "Overview from the south-west",
+   "rows": [
+    5,
+    7
+   ],
+   "body": "All 37 built bays of the west half, 888 ft between the end column lines: three stepped tiers (408, 264 and 120 ft wide) under ridge-and-valley roofs. Nothing east of the transept's west face is built. Roofs are ghosted so the frame reads."
+  },
+  {
+   "id": "west-end",
+   "cam": "cam_iso",
+   "title": "The west end",
+   "rows": [
+    5,
+    15
+   ],
+   "body": "The west end and the tier-1 roof in front. The roofs are plain sheets with the ridge-and-valley profile. There is no end wall, no glazing and no entrance: this is a dimensioned frame, not a likeness."
+  },
+  {
+   "id": "nave",
+   "cam": "cam_nave",
+   "title": "Inside the nave",
+   "rows": [
+    1,
+    3,
+    4
+   ],
+   "body": "From the nave at gallery height, looking north-east and up: columns, connecting pieces and lattice girders. Every column spacing is 24 ft and the nave is 72 ft between its bounding rows; both are gated against the plates."
+  },
+  {
+   "id": "gallery",
+   "cam": "cam_gallery",
+   "title": "From the gallery floor",
+   "rows": [
+    11,
+    12
+   ],
+   "body": "A strip of gallery floor, 22 ft 11 in above the ground, looking across the nave void. The railing along the void edge is inferred: no plate prints its height."
+  },
+  {
+   "id": "void-end",
+   "cam": "cam_voidend",
+   "title": "The end of the nave void",
+   "rows": [
+    14
+   ],
+   "body": "The cross railing that closes the nave void 72 ft from the west end (control D24), with the gallery floor beyond it."
+  },
+  {
+   "id": "stairs",
+   "cam": "cam_stairs",
+   "title": "An avenue staircase",
+   "rows": [
+    17,
+    18,
+    19
+   ],
+   "body": "Two ground flights rise to a landing, then upper flights climb to the galleries under a 48 x 24 ft cross gallery. Counts, widths and spacing match the record; the going and the handrail height are inferred from Plate XV."
+  },
+  {
+   "id": "stair-wells",
+   "cam": "cam_stairgal",
+   "title": "The stair wells from the gallery",
+   "rows": [
+    19
+   ],
+   "body": "Looking north over the cross gallery: the two 8 x 16 ft well holes and the landing. Hole positions were read off Plate II to about 1 ft."
+  },
+  {
+   "id": "joint",
+   "cam": "cam_joint",
+   "title": "Under the gallery",
+   "rows": [
+    3,
+    4
+   ],
+   "body": "Column heads and connecting pieces, lattice girders, and the underside of the gallery floor. Connecting pieces match the record in length and position; flanges and snugs are simplified."
+  },
+  {
+   "id": "crossing",
+   "pos": [
+    -62,
+    0,
+    1.8
+   ],
+   "target": [
+    0,
+    0,
+    4.2
+   ],
+   "hfov": 62,
+   "title": "Down the nave to the crossing",
+   "rows": [
+    28
+   ],
+   "body": "The frame stops 36 ft short of the crossing. The transept, its vault and everything east are not built. What stands at the crossing here is the one thing added to the model: the Osler crystal fountain, loaded from its own package through this manifest."
+  },
+  {
+   "id": "fountain",
+   "pos": [
+    -17,
+    -13,
+    3.4
+   ],
+   "target": [
+    0,
+    0,
+    4.6
+   ],
+   "hfov": 62,
+   "exhibit": "osler-fountain",
+   "title": "Osler crystal fountain, 1851",
+   "body": "F. & C. Osler's cut-crystal fountain: 27 ft (8.23 m) from waterline to spout on a 24 ft basin. Heights are read from one plate (about 5% per level, 10% per diameter); the basin diameter is adopted from the building's 24 ft module. The water plume is not modelled. Hyde Park 1851 only."
+  }
+ ]
+}

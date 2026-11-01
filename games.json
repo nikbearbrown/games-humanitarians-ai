@@ -3,6 +3,9 @@
     "LoonNet": {
       "blurb": "Four short games about the common loon's year on the Whitefish Chain, each tied to real field research.",
       "href": "https://loonnet.humanitarians.ai/"
+    },
+    "Crystal Palace": {
+      "blurb": "Walkthroughs of the Crystal Palace, built from the surviving plates and records."
     }
   },
   "games": [
@@ -45,6 +48,14 @@
       "desc": "Balance and collect while young chicks ride safely on a parent's back, in a simple browser game designed for the youngest visitors.",
       "url": "https://loonnet.humanitarians.ai/chick-taxi/index.html",
       "image": "https://loonnet.humanitarians.ai/screenshots/chick-taxi.png"
+    },
+    {
+      "id": "crystal-palace",
+      "project": "Crystal Palace",
+      "title": "Crystal Palace",
+      "tag": "Walkthrough",
+      "accent": "#7A4B1E",
+      "desc": "Walk the 1851 Hyde Park frame and its Osler crystal fountain. Sydenham comes next."
     }
   ]
 }

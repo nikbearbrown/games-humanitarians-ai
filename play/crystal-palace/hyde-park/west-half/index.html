@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Crystal Palace Walkthrough</title>
+<style>
+:root{--bg:#e9ecee;--fg:#16242a;--mut:#56666d;--card:rgba(255,255,255,.92);--line:#cfd6d8;--acc:#1e6a73;--on:#fff;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10171a;--fg:#e6eeee;--mut:#9fb2b6;--card:rgba(22,32,36,.92);--line:#2b3b40;--acc:#6cc2cc;--on:#08181a;color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:15px/1.5 Georgia,serif;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+canvas.drag{cursor:grabbing}
+.mono{font:12px/1.4 ui-monospace,Menlo,monospace}
+#top{position:fixed;left:max(16px,env(safe-area-inset-left));top:14px;right:max(16px,env(safe-area-inset-right));display:flex;justify-content:space-between;gap:12px;pointer-events:none}
+#top>*{pointer-events:auto}
+#title{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;max-width:min(520px,60vw)}
+#title b{display:block;font-size:15px;text-wrap:balance}
+#title span{color:var(--mut)}
+#bar{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-content:flex-start}
+button,select{font:12px ui-monospace,Menlo,monospace;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 10px;cursor:pointer}
+button:hover,select:hover{border-color:var(--acc)}
+button[aria-pressed="true"]{background:var(--acc);color:var(--on);border-color:var(--acc)}
+#card{position:fixed;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));max-width:600px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+#stops{display:flex;gap:5px;margin-bottom:8px;flex-wrap:wrap}
+#stops button{padding:0;width:22px;height:22px;border-radius:50%}
+#stops button.on{background:var(--acc);color:var(--on);border-color:var(--acc)}
+#card h2{margin:0 0 4px;font-size:17px;text-wrap:balance}
+#card p{margin:0 0 8px}
+#rows{color:var(--mut)}
+#rows a{color:var(--acc)}
+#mode{margin-top:6px;color:var(--mut)}
+#legend{position:fixed;right:max(16px,env(safe-area-inset-right));top:76px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;max-width:290px;display:none}
+#legend.on{display:block}
+#legend i{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+#legend div{margin:3px 0}
+#legend small{display:block;color:var(--mut);margin-top:6px}
+#pick{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(14px,env(safe-area-inset-bottom));max-width:290px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 12px;display:none}
+#pick.on{display:block}
+#msg{position:fixed;inset:0;display:grid;place-items:center;background:var(--bg);z-index:5;text-align:center;padding:24px}
+#msg.hide{display:none}
+@media (max-width:640px){#legend{top:auto;bottom:210px;right:16px}#pick{bottom:210px;left:16px;right:16px;max-width:none}}
+</style>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/jsm/"}}</script>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="top">
+  <div id="title"><b id="ttl">The Crystal Palace, Hyde Park 1851</b><span class="mono" id="sub">loading</span></div>
+  <div id="bar">
+    <button id="bTour" aria-pressed="true">Tour</button>
+    <button id="bEv" aria-pressed="false">Evidence</button>
+    <select id="sRoof" aria-label="Roof"><option value="ghost">Roof: ghost</option><option value="solid">Roof: solid</option><option value="off">Roof: off</option></select>
+    <button id="bFloor">Floor level</button>
+    <button id="bGal">Gallery level</button>
+  </div>
+</div>
+<div id="legend" class="mono"></div>
+<div id="pick" class="mono"></div>
+<div id="card">
+  <div id="stops"></div>
+  <h2 id="cT"></h2>
+  <p id="cB"></p>
+  <div id="rows" class="mono"></div>
+  <div id="mode" class="mono"></div>
+</div>
+<div id="msg"><div><b id="msgT">Loading the frame</b><br><span class="mono" id="msgS">7,757 placed parts from 12 library meshes</span></div></div>
+
+<script type="module">
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+
+const $ = s => document.querySelector(s);
+const IDLE_MS = 25000;            // hand control back to the tour after this long without input
+const MOVE_S = 5.5, DWELL_S = 8;  // seconds per transition, seconds per stop
+const FT = 0.3048;
+
+try {
+const M = await (await fetch(new URLSearchParams(location.search).get('manifest') || 'manifest.json')).json();
+$('#ttl').textContent = M.title;
+
+// ---------- renderer / scene (Z-up, metres: the blend's own coordinates) ----------
+const canvas = $('#c');
+const renderer = new THREE.WebGLRenderer({canvas, antialias: true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+const bgCol = new THREE.Color(dark ? 0x10171a : 0xe9ecee);
+const scene = new THREE.Scene();
+scene.background = bgCol;
+scene.fog = new THREE.Fog(bgCol, 450, 1800);
+const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 4000);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8d949a, 1.25));
+const sun = new THREE.DirectionalLight(0xfff1dc, 2.4);   // south-west key, as the blend's preview light
+sun.position.set(-300, -400, 500); scene.add(sun);
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(6000, 6000),
+  new THREE.MeshStandardMaterial({color: dark ? 0x1a2428 : 0xd8dcd9, roughness: 1}));
+ground.position.z = -0.3; scene.add(ground);                       // viewer ground, not part of the model
+const grid = new THREE.GridHelper(24 * FT * 60, 60, 0x8a9498, 0x8a9498); // one cell = one 24 ft bay
+grid.rotation.x = Math.PI / 2; grid.position.z = -0.29;
+grid.material.transparent = true; grid.material.opacity = 0.14; scene.add(grid);
+
+const gltf = url => new Promise((res, rej) => new GLTFLoader().load(url, res, undefined, rej));
+
+// ---------- frame: 12 library meshes instanced 7,757 times ----------
+const [lib, parts, camData] = await Promise.all([
+  gltf(M.frame.library),
+  fetch(M.frame.parts).then(r => r.json()),
+  fetch(M.frame.cameras).then(r => r.json())
+]);
+const instanced = [];   // {mesh, name, ids, orig, evid}
+const mat = new THREE.Matrix4();
+const bucketMat = {};
+for (const [k, b] of Object.entries(M.buckets))
+  bucketMat[k] = new THREE.MeshStandardMaterial({color: b.color, roughness: .8, side: THREE.DoubleSide});
+function matFor(name, orig){ const p = M.provenance[name]; return p ? bucketMat[p.bucket] : orig; }
+
+for (const node of lib.scene.children) {
+  const meshes = []; node.traverse(o => { if (o.isMesh) meshes.push(o); });
+  const name = node.name;
+  const m16 = parts.matrices[name];
+  for (const src of meshes) {
+    src.material.side = THREE.DoubleSide;
+    if (!m16) { src.userData.libName = name; scene.add(src); instanced.push({mesh: src, name, ids: [name], orig: src.material}); continue; }
+    const n = m16.length / 12;
+    const im = new THREE.InstancedMesh(src.geometry, src.material, n);
+    for (let i = 0; i < n; i++) {
+      const o = i * 12;
+      mat.set(m16[o], m16[o+1], m16[o+2], m16[o+3], m16[o+4], m16[o+5], m16[o+6], m16[o+7], m16[o+8], m16[o+9], m16[o+10], m16[o+11], 0, 0, 0, 1);
+      im.setMatrixAt(i, mat);
+    }
+    im.instanceMatrix.needsUpdate = true;
+    im.frustumCulled = false;
+    scene.add(im);
+    instanced.push({mesh: im, name, ids: parts.ids[name], orig: src.material});
+  }
+}
+// the roof is the one translucent layer
+const roofParts = instanced.filter(i => i.name === 'PART_RoofUnit');
+// the ground slab is a plain mesh named FLOOR_ground.001 inside the glb
+let evidence = false, roofMode = 'ghost';
+function applyLook() {
+  for (const i of instanced) {
+    const base = evidence ? matFor(i.name, i.orig) : i.orig;
+    i.mesh.material = base;
+  }
+  for (const r of roofParts) {
+    r.mesh.visible = roofMode !== 'off';
+    const m = r.mesh.material.clone ? r.mesh.material : r.orig;
+    r.mesh.material = (evidence ? bucketMat[M.provenance[r.name].bucket] : r.orig).clone();
+    r.mesh.material.side = THREE.DoubleSide;
+    if (roofMode === 'ghost') { r.mesh.material.transparent = true; r.mesh.material.opacity = .22; r.mesh.material.depthWrite = false; }
+  }
+  for (const e of exhibits) setExhibitLook(e);
+  $('#legend').classList.toggle('on', evidence);
+  $('#bEv').setAttribute('aria-pressed', evidence);
+}
+
+// ---------- exhibits: anything in manifest.exhibits ----------
+const exhibits = [];
+function setExhibitLook(e) {
+  e.group.traverse(o => {
+    if (!o.isMesh) return;
+    o.material = evidence ? bucketMat[e.def.bucket] : o.userData.orig;
+  });
+}
+async function loadExhibit(def) {
+  const g = await gltf(def.glb);
+  const group = new THREE.Group();
+  group.add(g.scene);
+  if (def.yup) g.scene.rotation.x = Math.PI / 2;      // glTF default Y-up -> this scene's Z-up
+  group.position.fromArray(def.position);
+  g.scene.traverse(o => { if (o.isMesh) o.userData.orig = o.material; });
+  scene.add(group);
+  const e = {def, group}; exhibits.push(e); return e;
+}
+for (const d of M.exhibits) { try { await loadExhibit(d); } catch (err) { console.warn('exhibit failed', d.id, err); } }
+
+// ---------- tour: poseAt(t) is a pure function of time ----------
+const rA = camData.res[0] / camData.res[1];
+const cams = Object.fromEntries(camData.cameras.map(c => [c.name, c]));
+const tmpCam = new THREE.PerspectiveCamera();
+function poseFromStop(s) {
+  if (s.cam) {
+    const c = cams[s.cam], m = new THREE.Matrix4().set(...c.matrix);
+    const p = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+    m.decompose(p, q, sc);
+    return {pos: p, quat: q, hfov: 2 * Math.atan(c.sensor / (2 * c.lens))};
+  }
+  tmpCam.up.set(0, 0, 1); tmpCam.position.fromArray(s.pos); tmpCam.lookAt(new THREE.Vector3().fromArray(s.target));
+  return {pos: tmpCam.position.clone(), quat: tmpCam.quaternion.clone(), hfov: THREE.MathUtils.degToRad(s.hfov)};
+}
+const stops = M.tour.filter(s => !s.cam || (cams[s.cam] && !cams[s.cam].ortho)).map(s => ({...s, pose: poseFromStop(s)}));
+const starts = []; let acc = 0;
+stops.forEach((s, i) => { acc += i === 0 ? 0 : MOVE_S; starts.push(acc); acc += DWELL_S; });   // dwell begins at starts[i]
+const TOTAL = acc + MOVE_S;                                                                      // + the move back to stop 0
+const smooth = u => u * u * u * (u * (u * 6 - 15) + 10);
+const fwd = new THREE.Vector3();
+function poseAt(t) {
+  t = ((t % TOTAL) + TOTAL) % TOTAL;
+  let i = stops.length - 1;
+  while (i > 0 && starts[i] > t) i--;
+  const cur = stops[i], end = starts[i] + DWELL_S;
+  if (t >= end) {   // moving on to the next stop (wraps to 0)
+    const nxt = stops[(i + 1) % stops.length], u = smooth((t - end) / MOVE_S);
+    return {i: (i + 1) % stops.length, pos: cur.pose.pos.clone().lerp(nxt.pose.pos, u), quat: cur.pose.quat.clone().slerp(nxt.pose.quat, u), hfov: THREE.MathUtils.lerp(cur.pose.hfov, nxt.pose.hfov, u), moving: true, label: i};
+  }
+  if (t < starts[i] && i > 0) { // moving in from previous
+    const prv = stops[i - 1], u = smooth((t - (starts[i] - MOVE_S)) / MOVE_S);
+    return {i, pos: prv.pose.pos.clone().lerp(cur.pose.pos, u), quat: prv.pose.quat.clone().slerp(cur.pose.quat, u), hfov: THREE.MathUtils.lerp(prv.pose.hfov, cur.pose.hfov, u), moving: true};
+  }
+  const d = (t - starts[i]) / DWELL_S;   // dwell: a slow push-in
+  fwd.set(0, 0, -1).applyQuaternion(cur.pose.quat);
+  return {i, pos: cur.pose.pos.clone().addScaledVector(fwd, 1.2 * d), quat: cur.pose.quat.clone(), hfov: cur.pose.hfov, moving: false};
+}
+
+// ---------- state / camera application ----------
+let mode = 'tour', paused = false, tourT = 0, lastInput = performance.now(), blend = null;
+let yaw = 0, pitch = 0;
+const cur = {pos: new THREE.Vector3(), quat: new THREE.Quaternion(), hfov: 1}, tq = new THREE.Quaternion(), ax = new THREE.Vector3();
+function setYawPitch(q) { fwd.set(0, 0, -1).applyQuaternion(q); yaw = Math.atan2(fwd.y, fwd.x); pitch = Math.asin(THREE.MathUtils.clamp(fwd.z, -1, 1)); }
+function quatFromYP() {
+  const a = new THREE.Quaternion().setFromAxisAngle(ax.set(0, 0, 1), yaw - Math.PI / 2);
+  const b = new THREE.Quaternion().setFromAxisAngle(ax.set(1, 0, 0), Math.PI / 2 + pitch);
+  return a.multiply(b);
+}
+function apply(p) {
+  camera.position.copy(p.pos); camera.quaternion.copy(p.quat);
+  const asp = innerWidth / innerHeight;
+  camera.aspect = asp;
+  camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(p.hfov / 2) / Math.min(asp, rA)));
+  camera.updateProjectionMatrix();
+}
+function resize() { renderer.setSize(innerWidth, innerHeight, false); }
+addEventListener('resize', resize); resize();
+
+function nearestStop() { let b = 0, bd = 1e9; stops.forEach((s, i) => { const d = s.pose.pos.distanceTo(cur.pos); if (d < bd) { bd = d; b = i; } }); return b; }
+function startTourAt(i) {   // glide from wherever the camera is to stop i's dwell
+  blend = {from: {pos: cur.pos.clone(), quat: cur.quat.clone(), hfov: cur.hfov}, t0: performance.now(), dur: 2600};
+  tourT = starts[i] + .001; mode = 'tour'; paused = false; syncUI();
+}
+function takeOver() {
+  if (mode === 'tour') { setYawPitch(cur.quat); blend = null; }
+  mode = 'explore'; lastInput = performance.now(); syncUI();
+}
+
+// ---------- input ----------
+const keys = new Set(); let dragging = false, moved = 0, lx = 0, ly = 0;
+canvas.addEventListener('pointerdown', e => { dragging = true; moved = 0; lx = e.clientX; ly = e.clientY; canvas.setPointerCapture(e.pointerId); canvas.classList.add('drag'); });
+canvas.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  const dx = e.clientX - lx, dy = e.clientY - ly; lx = e.clientX; ly = e.clientY; moved += Math.abs(dx) + Math.abs(dy);
+  if (moved > 4 && mode === 'tour') takeOver();
+  if (mode === 'explore') { yaw -= dx * .0045; pitch = THREE.MathUtils.clamp(pitch - dy * .0045, -1.5, 1.5); lastInput = performance.now(); }
+});
+canvas.addEventListener('pointerup', e => { dragging = false; canvas.classList.remove('drag'); if (moved <= 4) pick(e); });
+canvas.addEventListener('wheel', e => { e.preventDefault(); if (mode === 'tour') takeOver(); fwd.set(0, 0, -1).applyQuaternion(cur.quat); cur.pos.addScaledVector(fwd, -e.deltaY * .05); lastInput = performance.now(); }, {passive: false});
+addEventListener('keydown', e => { if (/INPUT|SELECT/.test(e.target.tagName)) return; const k = e.key.toLowerCase(); if ('wasdqe'.includes(k) || k.startsWith('arrow')) { keys.add(k); if (mode === 'tour') takeOver(); e.preventDefault(); } if (k === ' ') { paused = !paused; if (mode === 'tour') syncUI(); } });
+addEventListener('keyup', e => keys.delete(e.key.toLowerCase()));
+
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function pick(e) {
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera); ray.far = 400;
+  const hits = ray.intersectObjects(instanced.filter(i => i.mesh.visible && !(i === roofParts[0] && roofMode === 'ghost')).map(i => i.mesh), false);
+  const box = $('#pick');
+  const h = hits[0];
+  if (!h) { const ex = ray.intersectObjects(exhibits.map(x => x.group), true)[0]; if (ex) { const d = exhibits[0].def; box.innerHTML = `<b>${d.title}</b><br>${M.buckets.exhibit.label}<br>${d.placement}`; box.classList.add('on'); } else box.classList.remove('on'); return; }
+  const it = instanced.find(i => i.mesh === h.object);
+  const id = h.instanceId != null ? it.ids[h.instanceId] : it.name, p = M.provenance[it.name];
+  const meta = parts.meta[it.name]?.[h.instanceId] || {};
+  box.innerHTML = `<b>${id}</b><br>${p.kind}${meta.tier ? ' · tier ' + meta.tier : ''}<br><span style="color:${M.buckets[p.bucket].color}">■</span> ${M.buckets[p.bucket].label}<br>${p.note}<br>ledger row ${p.rows.join(', ')}`;
+  box.classList.add('on');
+}
+
+// ---------- UI ----------
+const stopsEl = $('#stops');
+stops.forEach((s, i) => { const b = document.createElement('button'); b.textContent = i + 1; b.title = s.title; b.onclick = () => startTourAt(i); stopsEl.appendChild(b); });
+$('#legend').innerHTML = Object.values(M.buckets).map(b => `<div><i style="background:${b.color}"></i>${b.label}</div>`).join('') + `<small>${M.buckets.record.help}.</small><small>Ground and grid are the viewer's, not the model's. One grid cell = one 24 ft bay.</small>`;
+let shownStop = -1;
+function syncUI() {
+  $('#bTour').setAttribute('aria-pressed', mode === 'tour' && !paused);
+  $('#mode').textContent = mode === 'tour' ? (paused ? 'tour paused' : 'tour · drag, scroll or WASD to explore') : 'explore · idle 25 s resumes the tour · WASD/QE move';
+}
+function showStop(i) {
+  if (i === shownStop) return; shownStop = i;
+  const s = stops[i];
+  [...stopsEl.children].forEach((b, k) => b.classList.toggle('on', k === i));
+  $('#cT').textContent = s.title; $('#cB').textContent = s.body;
+  $('#rows').innerHTML = s.rows ? `Departures ledger, rows ${s.rows.map(r => M.ledger ? `<a href="${M.ledger}" target="_blank" rel="noopener">${r}</a>` : r).join(', ')}` : '';
+  if (s.exhibit) { /* the exhibit's own stop */ }
+}
+$('#bTour').onclick = () => { if (mode === 'tour') { paused = !paused; syncUI(); } else startTourAt(nearestStop()); };
+$('#bEv').onclick = () => { evidence = !evidence; applyLook(); };
+$('#sRoof').onchange = e => { roofMode = e.target.value; applyLook(); };
+function level(z) { if (mode === 'tour') takeOver(); cur.pos.z = z; lastInput = performance.now(); }
+$('#bFloor').onclick = () => level(1.7);
+$('#bGal').onclick = () => level(22.917 * FT + 1.7);
+$('#sub').textContent = `${(Object.values(parts.counts).reduce((a, b) => a + b, 0) + instanced.filter(i => !parts.matrices[i.name]).length).toLocaleString()} placed parts · ${instanced.length - 1} instanced meshes + 1 slab · ${exhibits.length} added exhibit${exhibits.length === 1 ? '' : 's'}`;
+applyLook(); syncUI();
+
+// ---------- loop ----------
+const clock = new THREE.Clock();
+function step(dt) {
+  const now = performance.now();
+  if (mode === 'tour') {
+    if (!paused) tourT += dt;
+    const p = poseAt(tourT);
+    let out = p;
+    if (blend) {
+      const u = Math.min(1, (now - blend.t0) / blend.dur), s = smooth(u);
+      out = {pos: blend.from.pos.clone().lerp(p.pos, s), quat: blend.from.quat.clone().slerp(p.quat, s), hfov: THREE.MathUtils.lerp(blend.from.hfov, p.hfov, s), i: p.i};
+      if (u >= 1) blend = null;
+    }
+    cur.pos.copy(out.pos); cur.quat.copy(out.quat); cur.hfov = out.hfov;
+    showStop(p.i);
+  } else {
+    const sp = (keys.has('shift') ? 3 : 1) * 14 * dt;   // m/s
+    fwd.set(Math.cos(yaw), Math.sin(yaw), 0);
+    const right = ax.set(Math.sin(yaw), -Math.cos(yaw), 0).clone();
+    if (keys.has('w') || keys.has('arrowup')) cur.pos.addScaledVector(fwd, sp);
+    if (keys.has('s') || keys.has('arrowdown')) cur.pos.addScaledVector(fwd, -sp);
+    if (keys.has('d') || keys.has('arrowright')) cur.pos.addScaledVector(right, sp);
+    if (keys.has('a') || keys.has('arrowleft')) cur.pos.addScaledVector(right, -sp);
+    if (keys.has('e')) cur.pos.z += sp * .6;
+    if (keys.has('q')) cur.pos.z -= sp * .6;
+    if (keys.size) lastInput = now;
+    cur.quat.copy(quatFromYP());
+    if (now - lastInput > IDLE_MS && !dragging) startTourAt(nearestStop());
+  }
+  apply(cur);
+}
+// deterministic seek: a film capture can step t and read frames, no wall clock involved
+window.cpSeek = t => { mode = 'tour'; paused = true; blend = null; tourT = t; step(0); renderer.render(scene, camera); return poseAt(t).i; };
+window.__cp = {get mode() { return mode; }, get stop() { return shownStop; }, get t() { return tourT; }, TOTAL, stops: stops.length,
+  info: () => ({calls: renderer.info.render.calls, tris: renderer.info.render.triangles}), cur, get yaw() { return yaw; }, THREE, scene, camera};
+function frame() { step(Math.min(clock.getDelta(), .1)); renderer.render(scene, camera); requestAnimationFrame(frame); }
+cur.pos.copy(stops[0].pose.pos); cur.quat.copy(stops[0].pose.quat); cur.hfov = stops[0].pose.hfov;
+$('#msg').classList.add('hide');
+frame();
+} catch (err) {
+  console.error(err);
+  $('#msgT').textContent = 'Could not load the walkthrough'; $('#msgS').textContent = String(err.message || err);
+}
+</script>
+</body>
+</html>

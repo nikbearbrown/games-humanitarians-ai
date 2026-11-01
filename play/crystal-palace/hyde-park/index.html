@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crystal Palace, Hyde Park</title>
+<style>
+:root{--bg:#f4f1ea;--ink:#1d1b16;--mut:#6b655a;--line:#d8d2c4;--acc:#7a4b1e}
+@media (prefers-color-scheme:dark){:root{--bg:#161512;--ink:#ece8dd;--mut:#a39d8e;--line:#34312a;--acc:#d9a066}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.6rem;margin:.2em 0 .2em}h2{font-size:1.2rem;margin:1.8em 0 .4em}p{margin:.3em 0 1em;color:var(--mut)}a{color:var(--acc)}
+.lead{color:var(--ink)}
+.cols{display:grid;gap:18px;grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}
+@media(max-width:780px){.cols{grid-template-columns:1fr}}
+figure{margin:0}figure img{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px}
+figcaption,.noimg{font-size:.85rem;color:var(--mut);margin-top:.5em}
+.noimg{border:1px dashed var(--line);border-radius:8px;padding:16px;margin:0}
+.viewer{position:relative;height:min(70vh,640px);min-height:340px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.viewer canvas{width:100%;height:100%;display:block;touch-action:none}
+.status{position:absolute;left:10px;bottom:8px;right:10px;font-size:.8rem;color:#4a4639;background:#f4f1eacc;padding:3px 8px;border-radius:6px}
+.tag{font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+a.card,div.card{display:block;border:1px solid var(--line);border-radius:10px;padding:16px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--acc)}.card h2{margin:0 0 .2em;font-size:1.15rem}.card p{margin:0;font-size:.95rem}.soon{opacity:.8}
+ul.models{padding-left:1.1em;margin:.3em 0 1em;columns:2;column-gap:28px}ul.models li{margin:.15em 0;break-inside:avoid;font-size:.93rem}
+.mut{color:var(--mut)}@media(max-width:560px){ul.models{columns:1}}
+</style></head><body><main style=max-width:760px>
+<p><a href="../index.html">Crystal Palace</a></p><h1>Hyde Park, 1851</h1>
+<p class="lead">The Great Exhibition building in Hyde Park. What exists so far is the iron frame, reconstructed from Charles Downes's 1852 working drawings, and a set of object models.</p>
+<h2>Building walkthrough</h2>
+<div class="grid"><a class="card" href="west-half/index.html"><div class="tag">Tour</div><h2>West half of the frame</h2>
+<p>A guided tour of 7,757 placed parts across 37 of 77 bays, with the Osler crystal fountain at the crossing. Drag, scroll or use WASD to take over.</p></a></div>
+<p class="mut" style="margin-top:1em">Not built: glazing, the end wall, the entrance, the east half. The tour shows a dimensioned frame, not a likeness.</p>
+<h2>Object models (10)</h2>
+<p>Each page shows the model beside the image it was based on.</p><ul class="models"><li><a href="models/hp-great-elm/index.html">Great elm, procedural generic</a></li><li><a href="models/hp-louvre-and-blind/index.html">hp-louvre-and-blind</a></li><li><a href="models/hp-gallery-stair/index.html">Hyde Park gallery stair flight + landing edge + gallery rail</a></li><li><a href="models/hp-glazing-and-sash-panel/index.html">Hyde Park glazing and sash panel</a></li><li><a href="models/hp-floor-boards/index.html">Hyde Park open-boarded floor section</a></li><li><a href="models/hp-osler-crystal-fountain/index.html">Hyde Park Osler crystal fountain</a></li><li><a href="models/hp-roof-furrow-bay/index.html">Hyde Park roof glazing panel: timber sash bars + glass</a></li><li><a href="models/hyde-park-column-tier1/index.html">Hyde Park tier-1 iron column + girder stub</a></li><li><a href="models/hp-working-machine-exhibit/index.html">Nasmyth steam hammer, 1851 exhibit</a></li><li><a href="models/hp-crate-and-display-case/index.html">Packing crate + exhibition vitrine</a></li></ul>
+</main></body></html>
